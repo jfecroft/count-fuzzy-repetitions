@@ -16,12 +16,6 @@ for line_num, line in enumerate(content):
     for word in line.split():
         lines_used[word].append(line_num)
 
-parsed_data = []
-for key in lines_used:
-    parsed_data.append((key, len(lines_used[key]), lines_used[key]))
-
-parsed_data.sort()
-
 with open(FILE_NAME+'.dat', 'w') as f:
-    for line in parsed_data:
-        f.write(str(line)+'\n')
+    for key, value in sorted(lines_used.items()):
+        f.write('{}, {}, {} \n'.format(key, len(value), value))
