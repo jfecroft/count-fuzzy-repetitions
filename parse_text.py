@@ -1,3 +1,4 @@
+#! /usr/bin/env python
 """
 Usage:
   parse_text.py books <books>...
