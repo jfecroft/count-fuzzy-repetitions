@@ -24,7 +24,7 @@ for i, book in enumerate(BOOKS):
             word = word.strip("',.;:?!").title()
             if word.isalpha() is False:
                 print word
-            LINES_USED[word].append('{}.{}'.format(i+1, line_num))
+            LINES_USED[word].append('{}.{}'.format(i+1, line_num+1))
 
 with open('out.dat', 'w') as f:
     f.write('word, times used, lines used\n')
