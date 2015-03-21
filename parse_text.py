@@ -9,13 +9,14 @@ from collections import defaultdict
 FILE_NAME = sys.argv[1]
 
 with open(FILE_NAME+'.txt') as f:
-    content = f.readlines()
+    CONTENT = f.readlines()
 
-lines_used = defaultdict(list)
-for line_num, line in enumerate(content):
+LINES_USED = defaultdict(list)
+for line_num, line in enumerate(CONTENT):
     for word in line.split():
-        lines_used[word].append(line_num)
+        word = word.rstrip(',.;:').title()
+        LINES_USED[word].append(line_num)
 
 with open(FILE_NAME+'.dat', 'w') as f:
-    for key, value in sorted(lines_used.items()):
+    for key, value in sorted(LINES_USED.items()):
         f.write('{}, {}, {} \n'.format(key, len(value), value))
