@@ -21,7 +21,7 @@ for i, book in enumerate(BOOKS):
 
     for line_num, line in enumerate(CONTENT):
         for word in line.split():
-            word = word.rstrip(',.;:').title()
+            word = word.rstrip(',.;:?!').title()
             LINES_USED[word].append('{}.{}'.format(i+1, line_num))
 
 with open('out.dat', 'w') as f:
