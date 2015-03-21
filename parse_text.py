@@ -25,5 +25,6 @@ for i, book in enumerate(BOOKS):
             LINES_USED[word].append('{}.{}'.format(i+1, line_num))
 
 with open('out.dat', 'w') as f:
+    f.write('word, times used, lines used\n')
     for key, value in sorted(LINES_USED.items()):
         f.write('{}, {}, {} \n'.format(key, len(value), value))
