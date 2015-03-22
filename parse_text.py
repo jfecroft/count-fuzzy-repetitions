@@ -15,7 +15,7 @@ ARGUMENTS = docopt(__doc__, version='parse text 1.0')
 
 BOOKS = ARGUMENTS['<books>']
 
-LINES_USED = defaultdict(list)
+WORDS_USED = defaultdict(list)
 for i, book in enumerate(BOOKS):
     with open(book+'.txt') as f:
         CONTENT = f.readlines()
@@ -25,9 +25,9 @@ for i, book in enumerate(BOOKS):
             word = word.strip("',.;:?!").title()
             if word.isalpha() is False:
                 print word
-            LINES_USED[word].append('{}.{}'.format(i+1, line_num+1))
+            WORDS_USED[word].append('{}.{}'.format(i+1, line_num+1))
 
 with open('out.dat', 'w') as f:
     f.write('word, times used, lines used\n')
-    for key, value in sorted(LINES_USED.items()):
+    for key, value in sorted(WORDS_USED.items()):
         f.write('{}, {}, {}\n'.format(key, len(value), value))
