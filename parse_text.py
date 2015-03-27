@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 """
 Usage:
-  parse_text.py books <books>...
+  parse_text.py input <input>
 
 Options:
   -h --help     Show this screen.
@@ -9,13 +9,17 @@ Options:
 """
 from docopt import docopt
 from collections import defaultdict
+import yaml
 
 
 ARGUMENTS = docopt(__doc__, version='parse text 1.0')
 
-BOOKS = ARGUMENTS['<books>']
+with open('{}.yml'.format(ARGUMENTS['<input>']), 'r') as f:
+    INPUT_DICT = yaml.load(f)
 
+BOOKS = INPUT_DICT['books']
 WORDS_USED = defaultdict(list)
+
 for i, book in enumerate(BOOKS):
     with open(book+'.txt') as f:
         CONTENT = f.readlines()
