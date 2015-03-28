@@ -25,15 +25,15 @@ def load_yaml(filen):
     return return_dict
 
 
-class CountRepititions(object):
+class CountRepetitions(object):
     """
-    class to count repititions in text
+    class to count repetitions in text
     """
     def __init__(self, books, npairs=1, strip=False, *args, **kwargs):
         # init the words of interest
         self.words = None
         self.get_words(books, npairs, strip)
-        self.repititions = None
+        self.repetitions = None
 
     def get_identical_words(self):
         """
@@ -42,7 +42,7 @@ class CountRepititions(object):
         words_used = defaultdict(list)
         for word, line in self.words:
             words_used[word].append(line)
-        self.repititions = words_used
+        self.repetitions = words_used
 
     def get_words(self, books, npairs=1, strip=False):
         """
@@ -61,13 +61,13 @@ class CountRepititions(object):
                     words.append((word, '{}.{}'.format(i+1, line_num+1)))
         self.words = words
 
-    def write_repititions(self, filen='out.dat', min_reps=0):
+    def write_repetitions(self, filen='out.dat', min_reps=0):
         """
-        write repitions to file
+        write repetitions to file
         """
         with open(filen, 'w') as open_file:
             open_file.write('phrase, times used, lines used\n')
-            for key, value in sorted(self.repititions.iteritems()):
+            for key, value in sorted(self.repetitions.iteritems()):
                 if len(value) > min_reps:
                     open_file.write('"{}", {}, {}\n'.format(key,
                                                             len(value),
