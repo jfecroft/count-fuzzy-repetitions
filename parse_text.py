@@ -44,4 +44,5 @@ for i, book in enumerate(BOOKS):
 with open('out.dat', 'w') as f:
     f.write('word, times used, lines used\n')
     for key, value in sorted(WORDS_USED.iteritems()):
-        f.write('{}, {}, {}\n'.format(key, len(value), value))
+        if len(value) > 1:
+            f.write('{}, {}, {}\n'.format(key, len(value), value))
