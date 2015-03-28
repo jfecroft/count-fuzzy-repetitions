@@ -10,13 +10,17 @@ Options:
 from docopt import docopt
 from collections import defaultdict
 import yaml
-
+from fuzzywuzzy import fuzz
 
 ARGUMENTS = docopt(__doc__, version='parse text 1.0')
 
-with open('{}.yml'.format(ARGUMENTS['<input>']), 'r') as f:
-    INPUT_DICT = yaml.load(f)
 
+def load_yaml(filen):
+    with open('{}.yml'.format(filen), 'r') as f:
+        RETURN_DICT = yaml.load(f)
+    return RETURN_DICT
+
+INPUT_DICT = load_yaml(ARGUMENTS['<input>'])
 BOOKS = INPUT_DICT['books']
 WORDS_USED = defaultdict(list)
 
@@ -33,5 +37,5 @@ for i, book in enumerate(BOOKS):
 
 with open('out.dat', 'w') as f:
     f.write('word, times used, lines used\n')
-    for key, value in sorted(WORDS_USED.items()):
+    for key, value in sorted(WORDS_USED.iteritems()):
         f.write('{}, {}, {}\n'.format(key, len(value), value))
