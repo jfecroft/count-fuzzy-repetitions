@@ -58,7 +58,8 @@ class CountRepetitions(object):
                     if self.strip:
                         word = word.strip("',.;:?!").title()
                     words.append((word, '{}.{}'.format(i+1, line_num+1)))
-        return sorted(words)
+        words.sort()
+        return words
 
     def write_repetitions(self, filen='out.dat', min_reps=0):
         """
