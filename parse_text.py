@@ -10,8 +10,16 @@ Options:
 from docopt import docopt
 from collections import defaultdict
 import yaml
+from itertools import izip, tee, islice
 
 ARGUMENTS = docopt(__doc__, version='parse text 1.0')
+
+
+def nwise(iterable, n=2):
+    iters = tee(iterable, n)
+    for i, it in enumerate(iters):
+        next(islice(it, i, i), None)
+    return izip(*iters)
 
 
 def load_yaml(filen):
@@ -35,10 +43,9 @@ for i, book in enumerate(BOOKS):
         CONTENT = f.readlines()
 
     for line_num, line in enumerate(CONTENT):
-        for word in line.split():
+        for word in nwise(line.split(), n=3):
+            word = ' '.join(word)
             word = word.strip("',.;:?!").title()
-            if word.isalpha() is False:
-                print word
             WORDS_USED[word].append('{}.{}'.format(i+1, line_num+1))
 
 with open('out.dat', 'w') as f:
