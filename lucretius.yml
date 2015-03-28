@@ -1,0 +1,13 @@
+books:
+    ['lucretius-de_rerum_natura-book1',
+     'lucretius-de_rerum_natura-book2',
+     'lucretius-de_rerum_natura-book3',
+     'lucretius-de_rerum_natura-book4',
+     'lucretius-de_rerum_natura-book5',
+     'lucretius-de_rerum_natura-book6']
+n:
+    7 # number of neigboring words 
+min_reps:
+    2 # only print out if more than min_reps repitioans
+strip:
+    False # remove punctuation
