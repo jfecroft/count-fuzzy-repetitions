@@ -27,24 +27,22 @@ def load_yaml(filen):
 
 class CountRepetitions(object):
     """
-    class to count repetitions in text
+    count repetitions in text
     """
     def __init__(self, books, npairs=1, strip=False, *args, **kwargs):
         # init the words of interest
-        self.words = None
-        self.get_words(books, npairs, strip)
-        self.repetitions = None
+        self.words = self.get_words(books, npairs, strip)
+        self.repetitions = defaultdict(list)
 
     def get_identical_words(self):
         """
         group identical words
         """
-        words_used = defaultdict(list)
         for word, line in self.words:
-            words_used[word].append(line)
-        self.repetitions = words_used
+            self.repetitions[word].append(line)
 
-    def get_words(self, books, npairs=1, strip=False):
+    @staticmethod
+    def get_words(books, npairs=1, strip=False):
         """
         return a list of tuples of the form (word, line)
         """
@@ -52,14 +50,13 @@ class CountRepetitions(object):
         for i, book in enumerate(books):
             with open(book+'.txt') as open_file:
                 content = open_file.readlines()
-
             for line_num, line in enumerate(content):
                 for word in nwise(line.split(), npairs=npairs):
                     word = ' '.join(word)
                     if strip:
                         word = word.strip("',.;:?!").title()
                     words.append((word, '{}.{}'.format(i+1, line_num+1)))
-        self.words = words
+        return words
 
     def write_repetitions(self, filen='out.dat', min_reps=0):
         """
