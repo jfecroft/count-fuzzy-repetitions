@@ -10,16 +10,22 @@ Options:
 from docopt import docopt
 from collections import defaultdict
 import yaml
-from fuzzywuzzy import fuzz
 
 ARGUMENTS = docopt(__doc__, version='parse text 1.0')
 
 
 def load_yaml(filen):
-    with open('{}.yml'.format(filen), 'r') as f:
-        RETURN_DICT = yaml.load(f)
-    return RETURN_DICT
+    """
+    load a yaml file and return the json object
+    """
+    with open('{}.yml'.format(filen), 'r') as open_file:
+        return_dict = yaml.load(open_file)
+    return return_dict
 
+LATIN_SUFFIXES = load_yaml('suffix')
+LATIN_SUFFIXES = [suffix for
+                  values in LATIN_SUFFIXES.values() for
+                  suffix in values]
 INPUT_DICT = load_yaml(ARGUMENTS['<input>'])
 BOOKS = INPUT_DICT['books']
 WORDS_USED = defaultdict(list)
