@@ -21,7 +21,8 @@ MIN_REPS = INPUT_DICT['min_reps']
 
 
 LUC = CountRepetitions(books=BOOKS, npairs=NPAIRS, min_reps=MIN_REPS)
-LUC.get_identical_words()
+LUC.get_exact_repetitions()
+
 LUC.write_repetitions(
     filen='repetitions_{}pairs.dat'.format(INPUT_DICT['npairs']),
     min_reps=INPUT_DICT['min_reps'])

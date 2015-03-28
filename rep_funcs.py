@@ -37,12 +37,15 @@ class CountRepetitions(object):
         self.words = self.get_words()
         self.repetitions = defaultdict(list)
 
-    def get_identical_words(self):
+    def get_exact_repetitions(self):
         """
         group identical words
         """
         for word, line in self.words:
             self.repetitions[word].append(line)
+
+    def get_fuzzy_repetitions(self):
+        raise NotImplementedError
 
     def get_words(self):
         """
