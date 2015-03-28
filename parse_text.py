@@ -14,7 +14,6 @@ from itertools import izip, tee, islice
 
 ARGUMENTS = docopt(__doc__, version='parse text 1.0')
 
-
 def nwise(iterable, n=2):
     iters = tee(iterable, n)
     for i, it in enumerate(iters):
@@ -43,13 +42,14 @@ for i, book in enumerate(BOOKS):
         CONTENT = f.readlines()
 
     for line_num, line in enumerate(CONTENT):
-        for word in nwise(line.split(), n=3):
+        for word in nwise(line.split(), n=INPUT_DICT['n']):
             word = ' '.join(word)
-            word = word.strip("',.;:?!").title()
+            if INPUT_DICT['strip']:
+                word = word.strip("',.;:?!").title()
             WORDS_USED[word].append('{}.{}'.format(i+1, line_num+1))
 
-with open('out.dat', 'w') as f:
-    f.write('word, times used, lines used\n')
+with open('repititions_{}pairs.dat'.format(INPUT_DICT['n']), 'w') as f:
+    f.write('phrase, times used, lines used\n')
     for key, value in sorted(WORDS_USED.iteritems()):
-        if len(value) > 1:
-            f.write('{}, {}, {}\n'.format(key, len(value), value))
+        if len(value) > INPUT_DICT['min_reps']:
+            f.write('"{}", {}, {}\n'.format(key, len(value), value))
