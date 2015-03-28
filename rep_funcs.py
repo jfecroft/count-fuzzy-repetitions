@@ -31,7 +31,10 @@ class CountRepetitions(object):
     """
     def __init__(self, books, npairs=1, strip=False, *args, **kwargs):
         # init the words of interest
-        self.words = self.get_words(books, npairs, strip)
+        self.strip = strip
+        self.npairs = npairs
+        self.books = books
+        self.words = self.get_words()
         self.repetitions = defaultdict(list)
 
     def get_identical_words(self):
@@ -41,19 +44,18 @@ class CountRepetitions(object):
         for word, line in self.words:
             self.repetitions[word].append(line)
 
-    @staticmethod
-    def get_words(books, npairs=1, strip=False):
+    def get_words(self):
         """
         return a list of tuples of the form (word, line)
         """
         words = []
-        for i, book in enumerate(books):
+        for i, book in enumerate(self.books):
             with open(book+'.txt') as open_file:
                 content = open_file.readlines()
             for line_num, line in enumerate(content):
-                for word in nwise(line.split(), npairs=npairs):
+                for word in nwise(line.split(), npairs=self.npairs):
                     word = ' '.join(word)
-                    if strip:
+                    if self.strip:
                         word = word.strip("',.;:?!").title()
                     words.append((word, '{}.{}'.format(i+1, line_num+1)))
         return words

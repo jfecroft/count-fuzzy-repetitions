@@ -15,8 +15,12 @@ from rep_funcs import (
 
 ARGUMENTS = docopt(__doc__, version='parse text 1.0')
 INPUT_DICT = load_yaml(ARGUMENTS['<input>'])
+BOOKS = INPUT_DICT['books']
+NPAIRS = INPUT_DICT['npairs']
+MIN_REPS = INPUT_DICT['min_reps']
 
-LUC = CountRepetitions(**INPUT_DICT)
+
+LUC = CountRepetitions(books=BOOKS, npairs=NPAIRS, min_reps=MIN_REPS)
 LUC.get_identical_words()
 LUC.write_repetitions(
     filen='repetitions_{}pairs.dat'.format(INPUT_DICT['npairs']),
