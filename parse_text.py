@@ -18,11 +18,20 @@ INPUT_DICT = load_yaml(ARGUMENTS['<input>'])
 BOOKS = INPUT_DICT['books']
 NPAIRS = INPUT_DICT['npairs']
 MIN_REPS = INPUT_DICT['min_reps']
+STRIP = INPUT_DICT['strip']
+FUZZY_DIST = INPUT_DICT['fuzzy_dist']
+GROUP_LETTERS = INPUT_DICT['group_letters']
 
 
-LUC = CountRepetitions(books=BOOKS, npairs=NPAIRS, min_reps=MIN_REPS)
+LUC = CountRepetitions(books=BOOKS,
+                       npairs=NPAIRS,
+                       min_reps=MIN_REPS,
+                       strip=STRIP)
 LUC.get_exact_repetitions()
+LUC.get_fuzzy_repetitions(dist=FUZZY_DIST)
 
-LUC.write_repetitions(
+
+LUC.write_exact_repetitions(
     filen='repetitions_{}pairs.dat'.format(INPUT_DICT['npairs']),
     min_reps=INPUT_DICT['min_reps'])
+LUC.write_fuzzy_repetitions(min_reps=INPUT_DICT['min_reps'])

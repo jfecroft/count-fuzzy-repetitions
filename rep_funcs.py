@@ -1,9 +1,11 @@
 """
 classes and methods related to repition counting in text
 """
-from itertools import tee, izip, islice
+from itertools import tee, izip, islice, groupby
 import yaml
 from collections import defaultdict
+from cluster import HierarchicalClustering  # , KMeansClustering
+from fuzzywuzzy import fuzz
 
 
 def nwise(iterable, npairs=2):
@@ -25,6 +27,22 @@ def load_yaml(filen):
     return return_dict
 
 
+def fuzzy_distance(x, y):
+    return 100 - fuzz.token_sort_ratio(x[0], y[0])
+
+
+def match_first_word(x, y):
+    if x.split()[0] == y.split()[0]:
+        return 0
+    else:
+        return 1
+
+
+def groupby_first_letter(items, func=lambda x: x[0]):
+    items.sort(key=func)
+    return [list(group) for key, group in groupby(items, func)]
+
+
 class CountRepetitions(object):
     """
     count repetitions in text
@@ -35,17 +53,43 @@ class CountRepetitions(object):
         self.npairs = npairs
         self.books = books
         self.words = self.get_words()
-        self.repetitions = defaultdict(list)
+        self.exact_repetitions = defaultdict(list)
+        self.fuzzy_repetitions = list()
 
     def get_exact_repetitions(self):
         """
         group identical words
         """
         for word, line in self.words:
-            self.repetitions[word].append(line)
+            self.exact_repetitions[word].append(line)
 
-    def get_fuzzy_repetitions(self):
-        raise NotImplementedError
+    def get_fuzzy_repetitions(self, dist=10, group_letters=2):
+        """
+        return a fuzzy matching of words
+        this can be incrediable slow add some crude prefiltering based on the
+        first word of the sentence.
+        """
+        unique_words = self.exact_repetitions.items()
+        #unique_words = unique_words[:100]
+        groups = groupby_first_letter(unique_words, func=lambda x: x[0][:group_letters])
+        for group in groups:
+            print 'comparing words starting {}'.format(group[0][0][:group_letters])
+            print 'there are {}'.format(len(group))
+            clusters = HierarchicalClustering(
+                group,
+                fuzzy_distance)
+            cluster = clusters.getlevel(dist)
+            if len(cluster) > 1: 
+                self.fuzzy_repetitions.extend(cluster)
+            else:
+                self.fuzzy_repetitions.append(cluster)
+        # convert to standard form
+        tmp = []
+        for i in self.fuzzy_repetitions:
+            words = {item[0] for item in i}
+            lines = {line for item in i for line in item[1]}
+            tmp.append((words, lines))
+        self.fuzzy_repetitions = tmp
 
     def get_words(self):
         """
@@ -64,17 +108,29 @@ class CountRepetitions(object):
         words.sort()
         return words
 
-    def write_repetitions(self, filen='out.dat', min_reps=0):
+    def write_exact_repetitions(self, filen='out.dat', min_reps=0):
         """
         write repetitions to file
         """
         with open(filen, 'w') as open_file:
             open_file.write('phrase, times used, lines used\n')
-            for key, value in sorted(self.repetitions.iteritems()):
+            for key, value in sorted(self.exact_repetitions.iteritems()):
                 if len(value) > min_reps:
                     open_file.write('"{}", {}, {}\n'.format(key,
                                                             len(value),
                                                             value))
+
+    def write_fuzzy_repetitions(self, filen='fuzzy.dat', min_reps=0):
+        """
+        write repetitions to file
+        """
+        with open(filen, 'w') as open_file:
+            open_file.write('phrase, times used, lines used\n')
+            for words, lines in self.fuzzy_repetitions:
+                if len(lines) > min_reps:
+                    open_file.write('{}, {}, {}\n'.format(list(words),
+                                                          len(lines),
+                                                          list(lines)))
 
 
 def strip_suffix(word, suffixes):
