@@ -6,12 +6,14 @@ books:
      'lucretius-de_rerum_natura-book5',
      'lucretius-de_rerum_natura-book6']
 npairs:
-    3 # number of neigboring words 
+    6 # number of neigboring words 
 min_reps:
     1 # only print out if more than min_reps repitioans
+min_fuzzy_reps:
+    0
 strip:
-    True # remove punctuation
+    False # remove punctuation
 fuzzy_dist:
     10 # distance between string to group together
-group_letters:
-    2 # group words by initial number of matching letters
+max_group_size:
+    50 # used to reduce computation time the bigger the better

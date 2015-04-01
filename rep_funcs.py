@@ -38,6 +38,23 @@ def match_first_word(x, y):
         return 1
 
 
+def group_by(items, n=0):
+    func = lambda x: x[0][:n]
+    items.sort(key=func)
+    return [list(group) for key, group in groupby(items, func)]
+
+
+def rec_group(items, n, ii=0, return_groups=None):
+    if return_groups is None:
+        return_groups = []
+    if len(items) <= n:
+        return_groups.append(items)
+    else:
+        for group in group_by(items, ii+1):
+            rec_group(group, n, ii+1, return_groups=return_groups)
+    return return_groups
+
+
 def groupby_first_letter(items, func=lambda x: x[0]):
     items.sort(key=func)
     return [list(group) for key, group in groupby(items, func)]
@@ -47,51 +64,68 @@ class CountRepetitions(object):
     """
     count repetitions in text
     """
-    def __init__(self, books, npairs=1, strip=False, *args, **kwargs):
+    def __init__(self, books, max_group_size=50):
         # init the words of interest
-        self.strip = strip
-        self.npairs = npairs
+        # self.strip = strip
+        # self.npairs = npairs
         self.books = books
-        self.words = self.get_words()
-        self.exact_repetitions = defaultdict(list)
-        self.fuzzy_repetitions = list()
+        # self.words = self.get_words()
+        self.fuzzy_repetitions = None
+        self.max_group_size = max_group_size
+        self.matched = set()  # store matched phrases
 
-    def get_exact_repetitions(self):
+    def get_exact_repetitions(self, npairs=7):
         """
         group identical words
         """
-        for word, line in self.words:
-            self.exact_repetitions[word].append(line)
+        words = self.get_words(npairs=npairs)
+        exact_repetitions = defaultdict(list)
+        for word, line in words:
+            exact_repetitions[word].append(line)
+        return exact_repetitions
 
-    def get_fuzzy_repetitions(self, dist=10, group_letters=2):
+    def add_all_to_set(self, items):
+        """
+        create a set of already matched phrases
+        needed to avoid 3 word reps in a 4 word phrase for instance
+        """
+        reps = sum(len(item[1]) for item in items)
+        if reps > 1:
+            print items, reps
+            for item in items:
+                for line_num in item[1]:
+                    for n in range(1, len(item[0].split())+1):
+                        for words in nwise(item[0].split(), npairs=n):
+                            word = ' '.join(words)
+                            self.matched.update([(word, line_num)])
+
+    def get_fuzzy_repetitions(self, dist=10, max_group_size=50, npairs=7):
         """
         return a fuzzy matching of words
         this can be incrediable slow add some crude prefiltering based on the
         first word of the sentence.
         """
-        unique_words = self.exact_repetitions.items()
-        #unique_words = unique_words[:100]
-        groups = groupby_first_letter(unique_words, func=lambda x: x[0][:group_letters])
+        self.fuzzy_repetitions = list()
+        unique_words = self.get_exact_repetitions(npairs=npairs).items()
+        # recursive group need testing.
+        groups = rec_group(unique_words, max_group_size)
         for group in groups:
-            print 'comparing words starting {}'.format(group[0][0][:group_letters])
-            print 'there are {}'.format(len(group))
-            clusters = HierarchicalClustering(
-                group,
-                fuzzy_distance)
-            cluster = clusters.getlevel(dist)
-            if len(cluster) > 1: 
-                self.fuzzy_repetitions.extend(cluster)
+            if len(group) == 1:
+                self.fuzzy_repetitions.append(group)
             else:
-                self.fuzzy_repetitions.append(cluster)
-        # convert to standard form
+                clusters = HierarchicalClustering(
+                    group,
+                    fuzzy_distance).getlevel(dist)
+                self.fuzzy_repetitions.extend(clusters)
         tmp = []
         for i in self.fuzzy_repetitions:
+            self.add_all_to_set(i)
             words = {item[0] for item in i}
             lines = {line for item in i for line in item[1]}
             tmp.append((words, lines))
-        self.fuzzy_repetitions = tmp
+        return tmp
 
-    def get_words(self):
+    def get_words(self, npairs):
         """
         return a list of tuples of the form (word, line)
         """
@@ -100,37 +134,15 @@ class CountRepetitions(object):
             with open(book+'.txt') as open_file:
                 content = open_file.readlines()
             for line_num, line in enumerate(content):
-                for word in nwise(line.split(), npairs=self.npairs):
+                for word in nwise(line.split(), npairs=npairs):
                     word = ' '.join(word)
-                    if self.strip:
-                        word = word.strip("',.;:?!").title()
-                    words.append((word, '{}.{}'.format(i+1, line_num+1)))
+                    word_line = (word, '{}.{}'.format(i+1, line_num+1))
+                    if word_line not in self.matched:
+                        words.append(word_line)
+                    else:
+                        pass
         words.sort()
         return words
-
-    def write_exact_repetitions(self, filen='out.dat', min_reps=0):
-        """
-        write repetitions to file
-        """
-        with open(filen, 'w') as open_file:
-            open_file.write('phrase, times used, lines used\n')
-            for key, value in sorted(self.exact_repetitions.iteritems()):
-                if len(value) > min_reps:
-                    open_file.write('"{}", {}, {}\n'.format(key,
-                                                            len(value),
-                                                            value))
-
-    def write_fuzzy_repetitions(self, filen='fuzzy.dat', min_reps=0):
-        """
-        write repetitions to file
-        """
-        with open(filen, 'w') as open_file:
-            open_file.write('phrase, times used, lines used\n')
-            for words, lines in self.fuzzy_repetitions:
-                if len(lines) > min_reps:
-                    open_file.write('{}, {}, {}\n'.format(list(words),
-                                                          len(lines),
-                                                          list(lines)))
 
 
 def strip_suffix(word, suffixes):
