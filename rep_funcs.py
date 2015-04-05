@@ -41,7 +41,7 @@ def match_first_word(x, y):
 def group_by(items, n=0):
     func = lambda x: x[0][:n]
     items.sort(key=func)
-    return [list(group) for key, group in groupby(items, func)]
+    return [list(group) for _, group in groupby(items, func)]
 
 
 def rec_group(items, n, ii=0, return_groups=None):
