@@ -32,19 +32,26 @@ def fuzzy_distance(word1, word2):
 
 
 def group_by(items, num=0):
+    """
+    group by method needs merging with rec_group
+    """
+    # TODO use get to set item to use lambda function
     func = lambda x: x[0][:num]
     items.sort(key=func)
     return [list(group) for _, group in groupby(items, func)]
 
 
-def rec_group(items, num_max, ii=0, return_groups=None):
+def rec_group(items, num_max, iter_num=0, return_groups=None):
+    """
+    recursively group until groups small enough
+    """
     if return_groups is None:
         return_groups = []
     if len(items) <= num_max:
         return_groups.append(items)
     else:
-        for group in group_by(items, ii+1):
-            rec_group(group, num_max, ii+1, return_groups=return_groups)
+        for group in group_by(items, iter_num+1):
+            rec_group(group, num_max, iter_num+1, return_groups=return_groups)
     return return_groups
 
 
