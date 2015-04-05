@@ -31,13 +31,6 @@ def fuzzy_distance(x, y):
     return 100 - fuzz.token_sort_ratio(x[0], y[0])
 
 
-def match_first_word(x, y):
-    if x.split()[0] == y.split()[0]:
-        return 0
-    else:
-        return 1
-
-
 def group_by(items, n=0):
     func = lambda x: x[0][:n]
     items.sort(key=func)
