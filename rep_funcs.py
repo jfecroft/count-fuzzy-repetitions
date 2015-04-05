@@ -92,6 +92,7 @@ class CountRepetitions(object):
         reps = sum(len(item[1]) for item in items)
         if reps > 1:
             print items, reps
+            # could this be a comprehsenion?
             for item in items:
                 for line_num in item[1]:
                     for n in range(1, len(item[0].split())+1):
@@ -117,10 +118,11 @@ class CountRepetitions(object):
                     group,
                     fuzzy_distance).getlevel(dist)
                 self.fuzzy_repetitions.extend(clusters)
+        # tidy this up
         tmp = []
         for i in self.fuzzy_repetitions:
             self.add_all_to_set(i)
-            words = {item[0] for item in i}
+            words = {item[0].decode('utf-8') for item in i}
             lines = {line for item in i for line in item[1]}
             tmp.append((words, lines))
         return tmp

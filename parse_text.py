@@ -24,7 +24,6 @@ MAX_GROUP_SIZE = INPUT_DICT['max_group_size']
 MIN_FUZZY_REPS = INPUT_DICT['min_fuzzy_reps']
 
 
-filen = 'lucretius_repetitions.dat'
 
 LUC = CountRepetitions(books=BOOKS,
                        max_group_size=MAX_GROUP_SIZE)
@@ -36,6 +35,7 @@ for i in range(10, 1, -1):
         npairs=i)
     fuzzy_repetitions.extend(repetitions)
 
+filen = 'lucretius_repetitions.dat'
 fuzzy_repetitions.sort(key=lambda x: len(x[1]), reverse=True)
 with open(filen, 'w') as open_file:
     open_file.write('phrase, times used, lines used\n')
