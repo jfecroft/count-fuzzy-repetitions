@@ -31,20 +31,20 @@ def fuzzy_distance(word1, word2):
     return 100 - fuzz.token_sort_ratio(word1[0], word2[0])
 
 
-def group_by(items, n=0):
-    func = lambda x: x[0][:n]
+def group_by(items, num=0):
+    func = lambda x: x[0][:num]
     items.sort(key=func)
     return [list(group) for _, group in groupby(items, func)]
 
 
-def rec_group(items, n, ii=0, return_groups=None):
+def rec_group(items, num_max, ii=0, return_groups=None):
     if return_groups is None:
         return_groups = []
-    if len(items) <= n:
+    if len(items) <= num_max:
         return_groups.append(items)
     else:
         for group in group_by(items, ii+1):
-            rec_group(group, n, ii+1, return_groups=return_groups)
+            rec_group(group, num_max, ii+1, return_groups=return_groups)
     return return_groups
 
 
