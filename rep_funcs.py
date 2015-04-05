@@ -27,8 +27,8 @@ def load_yaml(filen):
     return return_dict
 
 
-def fuzzy_distance(x, y):
-    return 100 - fuzz.token_sort_ratio(x[0], y[0])
+def fuzzy_distance(word1, word2):
+    return 100 - fuzz.token_sort_ratio(word1[0], word2[0])
 
 
 def group_by(items, n=0):
