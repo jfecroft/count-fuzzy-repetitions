@@ -29,11 +29,11 @@ LUC = CountRepetitions(books=BOOKS,
                        max_group_size=MAX_GROUP_SIZE)
 fuzzy_repetitions = []
 for i in range(10, 1, -1):
-    repetitions = LUC.get_fuzzy_repetitions(
+ repetitions = LUC.get_fuzzy_repetitions(
         dist=FUZZY_DIST,
         max_group_size=MAX_GROUP_SIZE,
         npairs=i)
-    fuzzy_repetitions.extend(repetitions)
+        fuzzy_repetitions.extend(repetitions)
 
 filen = 'lucretius_repetitions.dat'
 fuzzy_repetitions.sort(key=lambda x: len(x[1]), reverse=True)
