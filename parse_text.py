@@ -1,11 +1,12 @@
 #! /usr/bin/env python
 """
 Usage:
-  parse_text.py input <input>
+  parse_text.py [--input=<input>]
 
 Options:
   -h --help     Show this screen.
   --version     Show version.
+  --input=<input>       Input yml file [default: lucretius]
 """
 from docopt import docopt
 from repetition_count import (
@@ -14,7 +15,7 @@ from repetition_count import (
     )
 
 ARGUMENTS = docopt(__doc__, version='parse text 1.0')
-INPUT_DICT = load_yaml(ARGUMENTS['<input>'])
+INPUT_DICT = load_yaml(ARGUMENTS['--input'])
 BOOKS = INPUT_DICT['books']
 NPAIRS = INPUT_DICT['npairs']
 MIN_REPS = INPUT_DICT['min_reps']
@@ -24,8 +25,7 @@ MAX_GROUP_SIZE = INPUT_DICT['max_group_size']
 MIN_FUZZY_REPS = INPUT_DICT['min_fuzzy_reps']
 
 
-LUC = CountRepetitions(books=BOOKS,
-                       max_group_size=MAX_GROUP_SIZE)
+LUC = CountRepetitions(books=BOOKS)
 FUZZY_REPETITIONS = []
 for i in range(10, 1, -1):
     repetitions = LUC.count_fuzzy_repetitions(
@@ -34,7 +34,7 @@ for i in range(10, 1, -1):
         npairs=i)
     FUZZY_REPETITIONS.extend(repetitions)
 
-FILEN = 'lucretius_repetitions.dat'
+FILEN = '{}_repetitions.dat'.format(ARGUMENTS['--input'])
 FUZZY_REPETITIONS.sort(key=lambda x: len(x[1]), reverse=True)
 with open(FILEN, 'w') as open_file:
     open_file.write('phrase, times used, lines used\n')

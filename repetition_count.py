@@ -69,7 +69,7 @@ class CountRepetitions(object):
     """
     count repetitions in text
     """
-    def __init__(self, books, max_group_size=50):
+    def __init__(self, books):
         self.books = books
         self.repeated_phrases = set()  # store matched phrases
 
@@ -107,9 +107,7 @@ class CountRepetitions(object):
 
     def count_fuzzy_repetitions(self, dist=10, max_group_size=50, npairs=7):
         """
-        return a fuzzy matching of words
-        this can be incrediable slow add some crude prefiltering based on the
-        first word of the sentence.
+        return a fuzzy matching of phrases
         """
         fuzzy_repetitions = list()
         unique_words = self.count_exact_repetitions(npairs=npairs).items()
@@ -123,6 +121,7 @@ class CountRepetitions(object):
                     CountRepetitions.fuzzy_distance).getlevel(dist)
                 fuzzy_repetitions.extend(clusters)
 
+        # update format
         for i, repeated_phrase in enumerate(fuzzy_repetitions):
             self.update_repeated_phrases(repeated_phrase)
             phrase = {item[0].decode('utf-8') for item in repeated_phrase}
