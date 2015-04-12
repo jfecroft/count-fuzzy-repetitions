@@ -27,37 +27,38 @@ def load_yaml(filen):
     return return_dict
 
 
-def fuzzy_distance(word1, word2):
-    return 100 - fuzz.token_sort_ratio(word1[0], word2[0])
-
-
-def group_by(items, num=0):
+class GroupWords(object):
     """
-    group by method needs merging with rec_group
+    recursivey group phrases by initial letter until groups are small enough
     """
-    # TODO use get to set item to use lambda function
-    func = lambda x: x[0][:num]
-    items.sort(key=func)
-    return [list(group) for _, group in groupby(items, func)]
+    @classmethod
+    def rec_group(cls, items, num_max, iter_num=0, return_groups=None, item=-1):
+        """
+        recursively group until groups small enough
+        """
+        if return_groups is None:
+            return_groups = []
+        if len(items) <= num_max:
+            return_groups.append(items)
+        else:
+            for group in GroupWords.group_by(items, iter_num+1, item=item):
+                GroupWords.rec_group(group,
+                                     num_max,
+                                     iter_num+1,
+                                     return_groups=return_groups)
+        return return_groups
 
-
-def rec_group(items, num_max, iter_num=0, return_groups=None):
-    """
-    recursively group until groups small enough
-    """
-    if return_groups is None:
-        return_groups = []
-    if len(items) <= num_max:
-        return_groups.append(items)
-    else:
-        for group in group_by(items, iter_num+1):
-            rec_group(group, num_max, iter_num+1, return_groups=return_groups)
-    return return_groups
-
-
-def groupby_first_letter(items, func=lambda x: x[0]):
-    items.sort(key=func)
-    return [list(group) for key, group in groupby(items, func)]
+    @staticmethod
+    def group_by(items, num=0, item=-1):
+        """
+        group by method needs merging with rec_group
+        """
+        if item >= 0:
+            func = lambda x: x[item][:num]
+        else:
+            func = lambda x: x[:num]
+        items.sort(key=func)
+        return [list(group) for _, group in groupby(items, func)]
 
 
 class CountRepetitions(object):
@@ -65,14 +66,14 @@ class CountRepetitions(object):
     count repetitions in text
     """
     def __init__(self, books, max_group_size=50):
-        # init the words of interest
-        # self.strip = strip
-        # self.npairs = npairs
         self.books = books
-        # self.words = self.get_words()
         self.fuzzy_repetitions = None
         self.max_group_size = max_group_size
         self.matched = set()  # store matched phrases
+
+    @staticmethod
+    def fuzzy_distance(word1, word2):
+        return 100 - fuzz.token_sort_ratio(word1[0], word2[0])
 
     def get_exact_repetitions(self, npairs=7):
         """
@@ -109,14 +110,14 @@ class CountRepetitions(object):
         self.fuzzy_repetitions = list()
         unique_words = self.get_exact_repetitions(npairs=npairs).items()
         # recursive group need testing.
-        groups = rec_group(unique_words, max_group_size)
+        groups = GroupWords.rec_group(unique_words, max_group_size, item=0)
         for group in groups:
             if len(group) == 1:
                 self.fuzzy_repetitions.append(group)
             else:
                 clusters = HierarchicalClustering(
                     group,
-                    fuzzy_distance).getlevel(dist)
+                    CountRepetitions.fuzzy_distance).getlevel(dist)
                 self.fuzzy_repetitions.extend(clusters)
         # tidy this up
         tmp = []
@@ -145,15 +146,3 @@ class CountRepetitions(object):
                         pass
         words.sort()
         return words
-
-
-def strip_suffix(word, suffixes):
-    """
-    return the root of the word without suffix
-    """
-    for suffix in suffixes:
-        if word.endswith(suffix):
-            word = word.rstrip(suffix)
-            return word
-    print word, 'couldnt remove suffix'
-    return 'ZZZZ'  # return something more sensible
