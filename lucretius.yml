@@ -6,7 +6,7 @@ books:
      'lucretius-de_rerum_natura-book5',
      'lucretius-de_rerum_natura-book6']
 npairs:
-    6 # number of neigboring words 
+    10 # number of neigboring words 
 min_reps:
     1 # only print out if more than min_reps repitioans
 min_fuzzy_reps:

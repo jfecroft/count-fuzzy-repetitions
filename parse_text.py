@@ -8,7 +8,7 @@ Options:
   --version     Show version.
 """
 from docopt import docopt
-from rep_funcs import (
+from repetition_count import (
     CountRepetitions,
     load_yaml,
     )
@@ -24,22 +24,21 @@ MAX_GROUP_SIZE = INPUT_DICT['max_group_size']
 MIN_FUZZY_REPS = INPUT_DICT['min_fuzzy_reps']
 
 
-
 LUC = CountRepetitions(books=BOOKS,
                        max_group_size=MAX_GROUP_SIZE)
-fuzzy_repetitions = []
+FUZZY_REPETITIONS = []
 for i in range(10, 1, -1):
- repetitions = LUC.get_fuzzy_repetitions(
+    repetitions = LUC.count_fuzzy_repetitions(
         dist=FUZZY_DIST,
         max_group_size=MAX_GROUP_SIZE,
         npairs=i)
-        fuzzy_repetitions.extend(repetitions)
+    FUZZY_REPETITIONS.extend(repetitions)
 
-filen = 'lucretius_repetitions.dat'
-fuzzy_repetitions.sort(key=lambda x: len(x[1]), reverse=True)
-with open(filen, 'w') as open_file:
+FILEN = 'lucretius_repetitions.dat'
+FUZZY_REPETITIONS.sort(key=lambda x: len(x[1]), reverse=True)
+with open(FILEN, 'w') as open_file:
     open_file.write('phrase, times used, lines used\n')
-    for words, lines in fuzzy_repetitions:
+    for words, lines in FUZZY_REPETITIONS:
         if len(lines) > MIN_REPS and len(words) > MIN_FUZZY_REPS:
             open_file.write('{}, {}, {}\n'.format(list(words),
                                                   len(lines),

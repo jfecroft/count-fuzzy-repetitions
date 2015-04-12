@@ -7,6 +7,9 @@ from collections import defaultdict
 from cluster import HierarchicalClustering  # , KMeansClustering
 from fuzzywuzzy import fuzz
 
+# pylint: disable=W0142
+# pylint: disable-msg=R0913
+
 
 def nwise(iterable, npairs=2):
     """
@@ -32,7 +35,8 @@ class GroupWords(object):
     recursivey group phrases by initial letter until groups are small enough
     """
     @classmethod
-    def rec_group(cls, items, num_max, iter_num=0, return_groups=None, item=-1):
+    def rec_group(cls, items, num_max, iter_num=0,
+                  return_groups=None, item=-1):
         """
         recursively group until groups small enough
         """
@@ -69,13 +73,16 @@ class CountRepetitions(object):
         self.books = books
         self.fuzzy_repetitions = None
         self.max_group_size = max_group_size
-        self.matched = set()  # store matched phrases
+        self.repeated_phrases = set()  # store matched phrases
 
     @staticmethod
     def fuzzy_distance(word1, word2):
+        """
+        return the fuzzy distance between two phrases
+        """
         return 100 - fuzz.token_sort_ratio(word1[0], word2[0])
 
-    def get_exact_repetitions(self, npairs=7):
+    def count_exact_repetitions(self, npairs=7):
         """
         group identical words
         """
@@ -85,30 +92,29 @@ class CountRepetitions(object):
             exact_repetitions[word].append(line)
         return exact_repetitions
 
-    def add_all_to_set(self, items):
+    def update_repeated_phrases(self, items):
         """
         create a set of already matched phrases
         needed to avoid 3 word reps in a 4 word phrase for instance
         """
         reps = sum(len(item[1]) for item in items)
         if reps > 1:
-            print items, reps
-            # could this be a comprehsenion?
-            for item in items:
-                for line_num in item[1]:
-                    for n in range(1, len(item[0].split())+1):
-                        for words in nwise(item[0].split(), npairs=n):
-                            word = ' '.join(words)
-                            self.matched.update([(word, line_num)])
+            self.repeated_phrases.update(
+                {(' '.join(words), line_num)
+                 for item in items
+                 for line_num in item[1]
+                 for n in range(1, len(item[0].split())+1)
+                 for words in nwise(item[0].split(),
+                                    npairs=n)})
 
-    def get_fuzzy_repetitions(self, dist=10, max_group_size=50, npairs=7):
+    def count_fuzzy_repetitions(self, dist=10, max_group_size=50, npairs=7):
         """
         return a fuzzy matching of words
         this can be incrediable slow add some crude prefiltering based on the
         first word of the sentence.
         """
         self.fuzzy_repetitions = list()
-        unique_words = self.get_exact_repetitions(npairs=npairs).items()
+        unique_words = self.count_exact_repetitions(npairs=npairs).items()
         # recursive group need testing.
         groups = GroupWords.rec_group(unique_words, max_group_size, item=0)
         for group in groups:
@@ -122,7 +128,7 @@ class CountRepetitions(object):
         # tidy this up
         tmp = []
         for i in self.fuzzy_repetitions:
-            self.add_all_to_set(i)
+            self.update_repeated_phrases(i)
             words = {item[0].decode('utf-8') for item in i}
             lines = {line for item in i for line in item[1]}
             tmp.append((words, lines))
@@ -140,7 +146,7 @@ class CountRepetitions(object):
                 for word in nwise(line.split(), npairs=npairs):
                     word = ' '.join(word)
                     word_line = (word, '{}.{}'.format(i+1, line_num+1))
-                    if word_line not in self.matched:
+                    if word_line not in self.repeated_phrases:
                         words.append(word_line)
                     else:
                         pass
