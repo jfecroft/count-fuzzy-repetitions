@@ -32,7 +32,7 @@ def load_yaml(filen):
 
 class GroupWords(object):
     """
-    recursivey group phrases by initial letter until groups are small enough
+    methods used to group words
     """
     @classmethod
     def group_phrases(cls, items, num_max, iter_num=0,
@@ -71,8 +71,6 @@ class CountRepetitions(object):
     """
     def __init__(self, books, max_group_size=50):
         self.books = books
-        self.fuzzy_repetitions = None
-        self.max_group_size = max_group_size
         self.repeated_phrases = set()  # store matched phrases
 
     @staticmethod
