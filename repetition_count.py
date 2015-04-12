@@ -35,8 +35,8 @@ class GroupWords(object):
     recursivey group phrases by initial letter until groups are small enough
     """
     @classmethod
-    def rec_group(cls, items, num_max, iter_num=0,
-                  return_groups=None, item=-1):
+    def group_phrases(cls, items, num_max, iter_num=0,
+                      return_groups=None, item=-1):
         """
         recursively group until groups small enough
         """
@@ -46,16 +46,16 @@ class GroupWords(object):
             return_groups.append(items)
         else:
             for group in GroupWords.group_by(items, iter_num+1, item=item):
-                GroupWords.rec_group(group,
-                                     num_max,
-                                     iter_num+1,
-                                     return_groups=return_groups)
+                GroupWords.group_phrases(group,
+                                         num_max,
+                                         iter_num+1,
+                                         return_groups=return_groups)
         return return_groups
 
     @staticmethod
     def group_by(items, num=0, item=-1):
         """
-        group by method needs merging with rec_group
+        return phrases grouped by their initial *num* letters
         """
         if item >= 0:
             func = lambda x: x[item][:num]
@@ -113,26 +113,24 @@ class CountRepetitions(object):
         this can be incrediable slow add some crude prefiltering based on the
         first word of the sentence.
         """
-        self.fuzzy_repetitions = list()
+        fuzzy_repetitions = list()
         unique_words = self.count_exact_repetitions(npairs=npairs).items()
-        # recursive group need testing.
-        groups = GroupWords.rec_group(unique_words, max_group_size, item=0)
+        groups = GroupWords.group_phrases(unique_words, max_group_size, item=0)
         for group in groups:
             if len(group) == 1:
-                self.fuzzy_repetitions.append(group)
+                fuzzy_repetitions.append(group)
             else:
                 clusters = HierarchicalClustering(
                     group,
                     CountRepetitions.fuzzy_distance).getlevel(dist)
-                self.fuzzy_repetitions.extend(clusters)
-        # tidy this up
-        tmp = []
-        for i in self.fuzzy_repetitions:
-            self.update_repeated_phrases(i)
-            words = {item[0].decode('utf-8') for item in i}
-            lines = {line for item in i for line in item[1]}
-            tmp.append((words, lines))
-        return tmp
+                fuzzy_repetitions.extend(clusters)
+
+        for i, repeated_phrase in enumerate(fuzzy_repetitions):
+            self.update_repeated_phrases(repeated_phrase)
+            phrase = {item[0].decode('utf-8') for item in repeated_phrase}
+            lines = {line for item in repeated_phrase for line in item[1]}
+            fuzzy_repetitions[i] = (phrase, lines)
+        return fuzzy_repetitions
 
     def get_words(self, npairs):
         """
@@ -148,7 +146,5 @@ class CountRepetitions(object):
                     word_line = (word, '{}.{}'.format(i+1, line_num+1))
                     if word_line not in self.repeated_phrases:
                         words.append(word_line)
-                    else:
-                        pass
         words.sort()
         return words
