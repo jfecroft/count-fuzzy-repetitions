@@ -1,0 +1,14 @@
+books:
+    ['the_declaration_of_independence']
+npairs:
+    10 # number of neigboring words 
+min_reps:
+    1 # only print out if more than min_reps repitioans
+min_fuzzy_reps:
+    0
+strip:
+    False # remove punctuation
+fuzzy_dist:
+    10 # distance between string to group together
+max_group_size:
+    50 # used to reduce computation time the bigger the better
