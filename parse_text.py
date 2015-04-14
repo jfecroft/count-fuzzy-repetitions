@@ -39,6 +39,9 @@ FUZZY_REPETITIONS.sort(key=lambda x: len(x[1]), reverse=True)
 with open(FILEN, 'w') as open_file:
     open_file.write('phrase, times used, lines used\n')
     for words, lines in FUZZY_REPETITIONS:
+        print type(words.pop())
+        import pdb
+        pdb.set_trace()
         if len(lines) > MIN_REPS and len(words) > MIN_FUZZY_REPS:
             open_file.write('{}, {}, {}\n'.format(list(words),
                                                   len(lines),

@@ -8,7 +8,7 @@ from cluster import HierarchicalClustering  # , KMeansClustering
 from fuzzywuzzy import fuzz
 
 # pylint: disable=W0142
-# pylint: disable-msg=R0913
+# pylint: disable=R0913
 
 
 def nwise(iterable, npairs=2):
@@ -124,7 +124,7 @@ class CountRepetitions(object):
         # update format
         for i, repeated_phrase in enumerate(fuzzy_repetitions):
             self.update_repeated_phrases(repeated_phrase)
-            phrase = {item[0].decode('utf-8') for item in repeated_phrase}
+            phrase = {item[0] for item in repeated_phrase}
             lines = {line for item in repeated_phrase for line in item[1]}
             fuzzy_repetitions[i] = (phrase, lines)
         return fuzzy_repetitions
