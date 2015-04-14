@@ -1,3 +1,6 @@
+"""
+convert lucretius xml to seperate text file for each book
+"""
 import xml.etree.ElementTree as ET
 FILEN = 'lucretius-de_rerum_natura'
 TREE = ET.parse('{}.xml'.format(FILEN))
