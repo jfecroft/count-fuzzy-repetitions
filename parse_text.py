@@ -8,11 +8,14 @@ Options:
   --version     Show version.
   --input=<input>       Input yml file [default: lucretius]
 """
+# pylint: disable=F0401
 from docopt import docopt
+# pylint: enable=F0401
 from repetition_count import (
     CountRepetitions,
     load_yaml,
     )
+
 
 ARGUMENTS = docopt(__doc__, version='parse text 1.0')
 INPUT_DICT = load_yaml(ARGUMENTS['--input'])
