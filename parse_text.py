@@ -26,6 +26,7 @@ MIN_REPS = INPUT_DICT['min_reps']
 FUZZY_DIST = INPUT_DICT['fuzzy_dist']
 MAX_GROUP_SIZE = INPUT_DICT['max_group_size']
 
+# TODO pdf output
 
 LUC = CountRepetitions(books=BOOKS)
 FUZZY_REPETITIONS = []
