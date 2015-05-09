@@ -31,10 +31,12 @@ MIN_FUZZY_REPS = INPUT_DICT['min_fuzzy_reps']
 LUC = CountRepetitions(books=BOOKS)
 FUZZY_REPETITIONS = []
 for i in range(10, 1, -1):
+    print 'Processing {} words phrases'.format(i)
     repetitions = LUC.count_fuzzy_repetitions(
         dist=FUZZY_DIST,
         max_group_size=MAX_GROUP_SIZE,
         npairs=i)
+    print 'Found {} repetitions of {} word phrases'.format(len(repetitions), i)
     FUZZY_REPETITIONS.extend(repetitions)
 
 FILEN = '{}_repetitions.dat'.format(ARGUMENTS['--input'])
@@ -43,6 +45,7 @@ with open(FILEN, 'w') as open_file:
     open_file.write('phrase, times used, lines used\n')
     for words, lines in FUZZY_REPETITIONS:
         if len(lines) > MIN_REPS and len(words) > MIN_FUZZY_REPS:
-            open_file.write('{}, {}, {}\n'.format(list(words),
-                                                  len(lines),
-                                                  list(lines)))
+            open_file.write('{}, {}, {}\n'.format(
+                "['{}']".format("', '".join(words)),
+                len(lines),
+                '[{}]'.format(', '.join(lines))))
