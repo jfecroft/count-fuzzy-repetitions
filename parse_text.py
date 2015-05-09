@@ -20,17 +20,16 @@ from repetition_count import (
 ARGUMENTS = docopt(__doc__, version='parse text 1.0')
 INPUT_DICT = load_yaml(ARGUMENTS['--input'])
 BOOKS = INPUT_DICT['books']
-NPAIRS = INPUT_DICT['npairs']
+MAX_WORD_PHRASES = INPUT_DICT['max_word_phrases']
+MIN_WORD_PHRASES = INPUT_DICT['min_word_phrases']
 MIN_REPS = INPUT_DICT['min_reps']
-STRIP = INPUT_DICT['strip']
 FUZZY_DIST = INPUT_DICT['fuzzy_dist']
 MAX_GROUP_SIZE = INPUT_DICT['max_group_size']
-MIN_FUZZY_REPS = INPUT_DICT['min_fuzzy_reps']
 
 
 LUC = CountRepetitions(books=BOOKS)
 FUZZY_REPETITIONS = []
-for i in range(10, 1, -1):
+for i in range(MAX_WORD_PHRASES, MIN_WORD_PHRASES-1, -1):
     print 'Processing {} words phrases'.format(i)
     repetitions = LUC.count_fuzzy_repetitions(
         dist=FUZZY_DIST,
@@ -44,7 +43,7 @@ FUZZY_REPETITIONS.sort(key=lambda x: len(x[1]), reverse=True)
 with open(FILEN, 'w') as open_file:
     open_file.write('phrase, times used, lines used\n')
     for words, lines in FUZZY_REPETITIONS:
-        if len(lines) > MIN_REPS and len(words) > MIN_FUZZY_REPS:
+        if len(lines) > MIN_REPS:
             open_file.write('{}, {}, {}\n'.format(
                 "['{}']".format("', '".join(words)),
                 len(lines),

@@ -5,14 +5,12 @@ books:
      'lucretius-de_rerum_natura-book4',
      'lucretius-de_rerum_natura-book5',
      'lucretius-de_rerum_natura-book6']
-npairs:
+max_word_phrases:
     10 # number of neigboring words 
+min_word_phrases:
+    6 # number of neigboring words
 min_reps:
     1 # only print out if more than min_reps repitioans
-min_fuzzy_reps:
-    0
-strip:
-    False # remove punctuation
 fuzzy_dist:
     10 # distance between string to group together
 max_group_size:
