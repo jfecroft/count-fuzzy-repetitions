@@ -1,0 +1,4 @@
+PyYAML==3.11
+cluster==1.2.2
+docopt==0.6.2
+fuzzywuzzy==0.5.0
