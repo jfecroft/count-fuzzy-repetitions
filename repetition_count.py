@@ -140,6 +140,7 @@ class CountRepetitions(object):
             for line_num, line in enumerate(content):
                 for word in nwise(line.split(), npairs=npairs):
                     word = ' '.join(word)
+                    word = word.strip(' ;:,.?!')
                     word_line = (word, '{}.{}'.format(i+1, line_num+1))
                     if word_line not in self.repeated_phrases:
                         words.append(word_line)
