@@ -6,12 +6,14 @@ books:
      'lucretius-de_rerum_natura-book5',
      'lucretius-de_rerum_natura-book6']
 max_word_phrases:
-    10 # number of neigboring words 
+    12 # number of neigboring words 
 min_word_phrases:
-    6 # number of neigboring words
+    3 # number of neigboring words
 min_reps:
     1 # only print out if more than min_reps repitioans
 fuzzy_dist:
     10 # distance between string to group together
 max_group_size:
-    50 # used to reduce computation time the bigger the better
+    55 # used to reduce computation time the bigger the better
+dist_func:
+    'token_set_ratio'
