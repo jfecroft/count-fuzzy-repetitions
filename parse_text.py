@@ -25,6 +25,7 @@ MIN_WORD_PHRASES = INPUT_DICT['min_word_phrases']
 MIN_REPS = INPUT_DICT['min_reps']
 FUZZY_DIST = INPUT_DICT['fuzzy_dist']
 MAX_GROUP_SIZE = INPUT_DICT['max_group_size']
+DIST_FUNC = INPUT_DICT['dist_func']
 
 # TODO pdf output
 
@@ -35,7 +36,8 @@ for i in range(MAX_WORD_PHRASES, MIN_WORD_PHRASES-1, -1):
     repetitions = LUC.count_fuzzy_repetitions(
         dist=FUZZY_DIST,
         max_group_size=MAX_GROUP_SIZE,
-        npairs=i)
+        npairs=i,
+        dist_func=DIST_FUNC)
     print 'Found {} repetitions of {} word phrases'.format(len(repetitions), i)
     FUZZY_REPETITIONS.extend(repetitions)
 

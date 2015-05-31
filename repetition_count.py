@@ -6,10 +6,19 @@ import yaml
 from collections import defaultdict
 from cluster import HierarchicalClustering  # , KMeansClustering
 from fuzzywuzzy import fuzz
+from functools import partial
 
-# pylint: disable=W0142
 # pylint: disable=R0913
 
+
+FUZZY_METRICS = {
+    'ratio': fuzz.ratio,
+    'partial_ratio': fuzz.partial_ratio,
+    'partial_token_sort_ratio': fuzz.partial_token_sort_ratio,
+    'partial_token_set_ratio': fuzz.partial_token_set_ratio,
+    'token_set_ratio': fuzz.token_set_ratio,
+    'token_sort_ratio': fuzz.token_sort_ratio,
+}
 
 def nwise(iterable, npairs=2):
     """
@@ -74,11 +83,11 @@ class CountRepetitions(object):
         self.repeated_phrases = set()  # store matched phrases
 
     @staticmethod
-    def fuzzy_distance(word1, word2):
+    def fuzzy_distance(word1, word2, metric):
         """
         return the fuzzy distance between two phrases
         """
-        return 100 - fuzz.token_sort_ratio(word1[0], word2[0])
+        return 100 - metric(word1[0], word2[0])
 
     def count_exact_repetitions(self, npairs=7):
         """
@@ -105,20 +114,24 @@ class CountRepetitions(object):
                  for words in nwise(item[0].split(),
                                     npairs=n)})
 
-    def count_fuzzy_repetitions(self, dist=10, max_group_size=50, npairs=7):
+    def count_fuzzy_repetitions(
+            self, dist=10, max_group_size=50, npairs=7,
+            dist_func='token_sort_ratio'):
         """
         return a fuzzy matching of phrases
         """
         fuzzy_repetitions = list()
         unique_words = self.count_exact_repetitions(npairs=npairs).items()
         groups = GroupWords.group_phrases(unique_words, max_group_size, item=0)
+        dist_func = partial(CountRepetitions.fuzzy_distance,
+                            metric=FUZZY_METRICS[dist_func])
         for group in groups:
             if len(group) == 1:
                 fuzzy_repetitions.append(group)
             else:
                 clusters = HierarchicalClustering(
                     group,
-                    CountRepetitions.fuzzy_distance).getlevel(dist)
+                    dist_func).getlevel(dist)
                 fuzzy_repetitions.extend(clusters)
 
         # update format
