@@ -17,37 +17,42 @@ from repetition_count import (
     )
 
 
-ARGUMENTS = docopt(__doc__, version='parse text 1.0')
-INPUT_DICT = load_yaml(ARGUMENTS['--input'])
-BOOKS = INPUT_DICT['books']
-MAX_WORD_PHRASES = INPUT_DICT['max_word_phrases']
-MIN_WORD_PHRASES = INPUT_DICT['min_word_phrases']
-MIN_REPS = INPUT_DICT['min_reps']
-FUZZY_DIST = INPUT_DICT['fuzzy_dist']
-MAX_GROUP_SIZE = INPUT_DICT['max_group_size']
-DIST_FUNC = INPUT_DICT['dist_func']
+def main():
+    """
+    run from command line
+    """
+    arguments = docopt(__doc__, version='parse text 1.0')
+    input_dict = load_yaml(arguments['--input'])
+    books = input_dict['books']
+    max_word_phrases = input_dict['max_word_phrases']
+    min_word_phrases = input_dict['min_word_phrases']
+    min_reps = input_dict['min_reps']
+    fuzzy_dist = input_dict['fuzzy_dist']
+    max_group_size = input_dict['max_group_size']
+    dist_func = input_dict['dist_func']
 
-# TODO pdf output
+    luc = CountRepetitions(books=books)
+    fuzzy_repetitions = []
+    for i in range(max_word_phrases, min_word_phrases-1, -1):
+        print 'Processing {} words phrases'.format(i)
+        repetitions = luc.count_fuzzy_repetitions(
+            dist=fuzzy_dist,
+            max_group_size=max_group_size,
+            npairs=i,
+            dist_func=dist_func)
+        print 'Found {} repetitions of {} word phrases'.format(
+            len(repetitions), i)
+        fuzzy_repetitions.extend(repetitions)
 
-LUC = CountRepetitions(books=BOOKS)
-FUZZY_REPETITIONS = []
-for i in range(MAX_WORD_PHRASES, MIN_WORD_PHRASES-1, -1):
-    print 'Processing {} words phrases'.format(i)
-    repetitions = LUC.count_fuzzy_repetitions(
-        dist=FUZZY_DIST,
-        max_group_size=MAX_GROUP_SIZE,
-        npairs=i,
-        dist_func=DIST_FUNC)
-    print 'Found {} repetitions of {} word phrases'.format(len(repetitions), i)
-    FUZZY_REPETITIONS.extend(repetitions)
-
-FILEN = '{}_repetitions.dat'.format(ARGUMENTS['--input'])
-FUZZY_REPETITIONS.sort(key=lambda x: len(x[1]), reverse=True)
-with open(FILEN, 'w') as open_file:
-    open_file.write('phrase, times used, lines used\n')
-    for words, lines in FUZZY_REPETITIONS:
-        if len(lines) > MIN_REPS:
-            open_file.write('{}, {}, {}\n'.format(
-                "['{}']".format("', '".join(words)),
-                len(lines),
-                '[{}]'.format(', '.join(lines))))
+    filen = '{}_repetitions.dat'.format(arguments['--input'])
+    fuzzy_repetitions.sort(key=lambda x: len(x[1]), reverse=True)
+    with open(filen, 'w') as open_file:
+        open_file.write('phrase, times used, lines used\n')
+        for words, lines in fuzzy_repetitions:
+            if len(lines) > min_reps:
+                open_file.write('{}, {}, {}\n'.format(
+                    "['{}']".format("', '".join(words)),
+                    len(lines),
+                    '[{}]'.format(', '.join(lines))))
+if __name__ == '__main__':
+    main()
